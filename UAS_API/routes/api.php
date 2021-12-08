@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('register', 'Api\AuthController@register');
 Route::post('login', 'Api\AuthController@login');
+Route::post('verify', 'Api\AuthController@verify');
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('book', 'Api\BookController@index');
@@ -34,4 +35,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('user', 'Api\UserController@store');
     Route::put('user/{id}', 'Api\UserController@update');
     Route::delete('user/{id}', 'Api\UserController@destroy');
+
+    Route::get('peminjaman', 'Api\PeminjamanController@index');
+    Route::get('peminjaman/{id}', 'Api\PeminjamanController@show');
+    Route::post('peminjaman', 'Api\PeminjamanController@store');
+    Route::put('peminjaman/{id}', 'Api\PeminjamanController@update');
+    Route::delete('peminjaman/{id}', 'Api\PeminjamanController@destroy');
+
+    Route::get('pengembalian', 'Api\PengembalianController@index');
+    Route::get('pengembalian/{id}', 'Api\PengembalianController@show');
+    Route::post('pengembalian', 'Api\PengembalianController@store');
+    Route::put('pengembalian/{id}', 'Api\PengembalianController@update');
+    Route::delete('pengembalian/{id}', 'Api\PengembalianController@destroy');
 });

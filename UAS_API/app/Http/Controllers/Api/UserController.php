@@ -109,7 +109,7 @@ class UserController extends Controller
         $updateData = $request->all(); // mengambil semua input dari api client
         $validate = Validator::make($updateData, [
             'fullname' => 'required',
-            'email' => 'required|email:rfc,dns|unique:users',
+            'email' => ['required', 'email:rfc,dns', Rule::unique('users')->ignore($user)],
             'password' => 'required',
             'phonenumber' => 'required',
             'address' => 'required'
@@ -120,7 +120,7 @@ class UserController extends Controller
 
         $updateData['password'] = bcrypt($request->password); // enkripsi password
 
-        $user->name = $updateData['name'];
+        $user->fullname = $updateData['fullname'];
         $user->email = $updateData['email'];
         $user->password = $updateData['password'];
         $user->phonenumber = $updateData['phonenumber'];

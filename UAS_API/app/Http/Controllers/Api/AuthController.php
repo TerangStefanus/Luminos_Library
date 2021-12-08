@@ -7,7 +7,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // tambahkan ini
 use App\Models\User; // import model user
+use Illuminate\Validation\Rule;
 use Validator; // import library untuk validasi
+use Mail;
+use App\Mail\UserMail;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -23,17 +27,26 @@ class AuthController extends Controller
         ]); // membuat rule validasi input
 
         $registrationData['role'] = 'string';
-        $registrationData['token'] = 'string';
+        $registrationData['token'] = rand(100000,999999);
 
         if ($validate->fails())
             return response(['message' => $validate->errors()], 400); //return error validasi input
 
         $registrationData['password'] = bcrypt($request->password); // enkripsi password
         $user = User::create($registrationData); // membuat user baru
-        return response([
-            'message' => 'Register Success',
-            'user' => $user
-        ], 200); // return data user dalam bentuk json
+
+        try{
+            $detail = [
+                'body' => $registrationData['token']
+            ];
+            Mail::to($registrationData['email'])->send(new UserMail($detail));
+            return response([
+                'message' => 'Register Success',
+                'user' => $user
+            ], 200); // return data user dalam bentuk json
+        }catch (Exception $e){
+            return;
+        }
     }
 
     public function login(Request $request)
@@ -60,5 +73,29 @@ class AuthController extends Controller
             'access_token' => $token,
             'password' => $request->password
         ]); // return data user dan token dalam bentuk json
+    }
+
+    public function verify(Request $request){
+        $verifyData = $request->all();
+        $validate =  Validator::make($verifyData, [
+            'token' => 'required|digits:6|numeric'
+        ]);
+
+        
+        $user = DB::table('user')->where('token', $verifyData['token']);
+        // User::where('token', $verifyData['token'])->get();
+        if (!is_null($user)) {
+            User::where('token', $verifyData['token'])
+                    ->update(['token' => '1']);
+            return response([
+                'message' => "Verification successful",
+                'data' => $user
+            ], 200);
+        } 
+
+        return response([
+            'message' => 'User not found',
+            'data' => null
+        ], 404);
     }
 }

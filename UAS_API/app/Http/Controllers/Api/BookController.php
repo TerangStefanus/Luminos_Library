@@ -13,7 +13,7 @@ class BookController extends Controller
     // method untuk menampilkan semua data product (read)
     public function index()
     {
-        $books = book::all(); // mengambil semua data book
+        $books = Book::all(); // mengambil semua data book
 
         if (count($books) > 0) {
             return response([
@@ -31,7 +31,7 @@ class BookController extends Controller
     // method untuk menampilkan 1 data book (search)
     public function show($id)
     {
-        $book = book::find($id); // mencari data book berdasarkan id
+        $book = Book::find($id); // mencari data book berdasarkan id
 
         if (!is_null($book)) {
             return response([
@@ -51,7 +51,7 @@ class BookController extends Controller
     {
         $storeData = $request->all(); // mengambil semua input dari api client
         $validate = Validator::make($storeData, [
-            'images' => 'required',
+            'images' => '',
             'judul' => 'required',
             'quantity' => 'required|numeric',
             'halaman' => 'required|numeric',
@@ -64,7 +64,7 @@ class BookController extends Controller
         if ($validate->fails())
             return response(['message' => $validate->errors()], 400); // return error invalid input 
 
-        $book = book::create($storeData);
+        $book = Book::create($storeData);
         return response([
             'message' => 'Add book Success',
             'data' => $book
@@ -74,7 +74,7 @@ class BookController extends Controller
     //method untuk menghapus 1 data product (delete)
     public function destroy($id)
     {
-        $book = book::find($id); // mencaari data product berdasarkan id
+        $book = Book::find($id); // mencaari data product berdasarkan id
 
         if (is_null($book)) {
             return response ([
@@ -99,7 +99,7 @@ class BookController extends Controller
     //method untuk mengubah 1 data book (update)
     public function update(Request $request, $id)
     {
-        $book = book::find($id); // menbcaru data book berdasarkan id
+        $book = Book::find($id); // menbcaru data book berdasarkan id
         if (is_null($book)) {
             return response([
                 'message' => 'book Not Found',
@@ -109,7 +109,7 @@ class BookController extends Controller
 
         $updateData = $request->all(); // mengambil semua input dari api client
         $validate = Validator::make($updateData, [
-            'images' => 'required',
+            'images' => '',
             'judul' => 'required',
             'quantity' => 'required|numeric',
             'halaman' => 'required|numeric',
@@ -122,7 +122,6 @@ class BookController extends Controller
         if ($validate->fails())
             return response(['message' => $validate->errors()], 400); // return error invalid input
 
-        $book->images = $updateData['images'];
         $book->judul = $updateData['judul'];
         $book->quantity = $updateData['quantity'];
         $book->halaman = $updateData['halaman'];
